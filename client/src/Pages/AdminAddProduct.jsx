@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function AdminAddProduct() {
   const navigate = useNavigate();
@@ -30,19 +30,16 @@ export default function AdminAddProduct() {
     setLoading(true);
     setError("");
 
+    if (!form.image) {
+    setError("Please upload image first");
+    setLoading(false);
+    return;
+  }
+
     try {
       const token = localStorage.getItem("adminToken");
 
-      await axios.post(
-        "http://localhost:5000/api/products",
-        form,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/api/products", form);
 
       navigate("/admin/products");
     } catch (err) {
@@ -51,6 +48,27 @@ export default function AdminAddProduct() {
       setLoading(false);
     }
   };
+
+  const uploadImageHandler = async (e) => {
+  const file = e.target.files[0];
+  const formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    const { data } = await api.post("/api/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    setForm((prev) => ({
+      ...prev,
+      image: data.imageUrl,
+    }));
+  } catch (error) {
+    alert("Image upload failed");
+  }
+};
 
   return (
     <div className="max-w-xl">
@@ -89,12 +107,11 @@ export default function AdminAddProduct() {
           className="w-full p-3 bg-zinc-900 rounded"
         />
 
+        
         <input
-          name="image"
-          placeholder="Image URL"
-          value={form.image}
-          onChange={handleChange}
-          className="w-full p-3 bg-zinc-900 rounded"
+          type="file"
+          onChange={uploadImageHandler}
+          className="w-full p-2 bg-zinc-900"
         />
 
         <select

@@ -36,6 +36,65 @@
 
 // export const useCart = () => useContext(CartContext);
 
+
+// .2
+// import { createContext, useContext, useState } from "react";
+
+// const CartContext = createContext();
+
+// export function CartProvider({ children }) {
+//   const [cartItems, setCartItems] = useState([]);
+
+//   const addToCart = (product) => {
+//     setCartItems((prev) => {
+//       const exists = prev.find((item) => item.id === product.id);
+
+//       if (exists) {
+//         return prev.map((item) =>
+//           item.id === product.id
+//             ? { ...item, qty: item.qty + 1 }
+//             : item
+//         );
+//       }
+
+//       return [...prev, { ...product, qty: 1 }];
+//     });
+//   };
+
+//   const removeFromCart = (id) => {
+//     setCartItems((prev) => prev.filter((item) => item.id !== id));
+//   };
+
+//   const totalQuantity = cartItems.reduce(
+//     (sum, item) => sum + item.qty,
+//     0
+//   );
+
+//   const total = cartItems.reduce(
+//   (sum, item) => sum + Number(item.price),
+//   0
+//   );
+
+
+//   return (
+//     <CartContext.Provider
+//       value={{
+//         cartItems,
+//         addToCart,
+//         removeFromCart,
+//         totalQuantity,
+//         subtotal,
+//       }}
+//     >
+//       {children}
+//     </CartContext.Provider>
+//   );
+// }
+
+// export const useCart = () => useContext(CartContext);
+
+
+// .3
 import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
@@ -45,11 +104,11 @@ export function CartProvider({ children }) {
 
   const addToCart = (product) => {
     setCartItems((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
+      const exists = prev.find((item) => item._id === product._id);
 
       if (exists) {
         return prev.map((item) =>
-          item.id === product.id
+          item._id === product._id
             ? { ...item, qty: item.qty + 1 }
             : item
         );
@@ -60,7 +119,7 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    setCartItems((prev) => prev.filter((item) => item._id !== id));
   };
 
   const totalQuantity = cartItems.reduce(
@@ -68,8 +127,9 @@ export function CartProvider({ children }) {
     0
   );
 
+  // ✅ THIS WAS MISSING
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.qty * Number(item.price.replace(",", "")),
+    (sum, item) => sum + Number(item.price) * item.qty,
     0
   );
 

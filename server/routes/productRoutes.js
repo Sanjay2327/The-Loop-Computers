@@ -9,8 +9,9 @@
 // export default router;
 
 import express from "express";
-import { getProducts } from "../controllers/productController.js";
+import { getProducts, createProduct, updateProduct, deleteProduct, } from "../controllers/productController.js";
 import { protectAdmin } from "../middleware/authMiddleware.js";
+
 
 const router = express.Router();
 
@@ -23,5 +24,10 @@ router.post("/", protectAdmin, createProduct);
 router.post("/admin-test", protectAdmin, (req, res) => {
   res.json({ message: "Admin access granted" });
 });
+
+// to edit and delete products
+
+router.put("/:id", protectAdmin, updateProduct);
+router.delete("/:id", protectAdmin, deleteProduct);
 
 export default router;

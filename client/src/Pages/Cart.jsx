@@ -44,10 +44,36 @@
 //   );
 // }
 
+
+import api from "../services/api";
 import { useCart } from "../Context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
-  const { cartItems, removeFromCart, subtotal } = useCart();
+  const navigate = useNavigate();
+  const { cartItems, removeFromCart, subtotal, clearCart } = useCart();
+
+    const placeOrderHandler = async () => {
+    const orderData = {
+      items: cartItems.map((item) => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        qty: item.qty,
+        image: item.image,
+      })),
+      totalAmount: subtotal,
+    };
+
+    try {
+      await api.post("/api/orders", orderData);
+      clearCart();
+      navigate("/order-success");
+    } catch (error) {
+      alert("Failed to place order");
+    }
+  };
+
 
   if (cartItems.length === 0) {
     return (
@@ -85,6 +111,12 @@ export default function Cart() {
               >
                 Remove
               </button>
+              {/* Checkout Button */}
+      <div className="mt-6 text-right">
+        <button className="px-6 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 transition text-white font-medium">
+          Proceed to Checkout
+        </button>
+      </div>
             </div>
           </div>
         ))}
@@ -98,12 +130,7 @@ export default function Cart() {
         </span>
       </div>
 
-      {/* Checkout Button */}
-      <div className="mt-6 text-right">
-        <button className="px-6 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 transition text-white font-medium">
-          Proceed to Checkout
-        </button>
-      </div>
+      
     </section>
   );
 }

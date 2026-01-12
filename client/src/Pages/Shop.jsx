@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import { fetchProducts } from "../services/api";
+// import { fetchProducts } from "../services/api";
+import api from "../services/api";
+
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
@@ -9,8 +11,11 @@ export default function Shop() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await fetchProducts();
+        // const data = await fetchProducts();
+        // setProducts(data);
+        const { data } = await api.get("/api/products");
         setProducts(data);
+
       } catch (err) {
         console.error("Error fetching products", err);
       } finally {

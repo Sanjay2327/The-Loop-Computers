@@ -1,24 +1,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../services/api";
 
 export default function AdminProducts() {
+  
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { data } = api.get("/api/products");
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("adminToken");
 
-        const { data } = await axios.get(
-          "http://localhost:5000/api/products",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const { data }  = await api.get("/api/products");
 
         setProducts(data);
       } catch (err) {
@@ -38,6 +35,17 @@ export default function AdminProducts() {
   if (error) {
     return <p className="text-red-400">{error}</p>;
   }
+
+  const deleteHandler = async (id) => {
+    if (!window.confirm("Delete this product?")) return;
+
+    try {
+      await api.delete(`/api/products/${id}`);
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+    } catch (error) {
+      alert("Failed to delete product");
+    }
+  };
 
   return (
     <div>
@@ -64,6 +72,23 @@ export default function AdminProducts() {
                 <td className="p-3">{product.category}</td>
                 <td className="p-3">
                   {product.isRefurbished ? "Yes" : "No"}
+                </td>
+                <td className="p-2 flex gap-4"> 
+                  <button
+                    onClick={() =>
+                      navigate(`/admin/products/edit/${product._id}`)
+                    }
+                    className="text-blue-500 hover:underline"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => deleteHandler(product._id)}
+                    className="text-red-500 hover:underline"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

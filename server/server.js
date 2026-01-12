@@ -1,20 +1,34 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import { initCloudinary } from "./config/cloudinary.js";
+initCloudinary(); 
+
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import productRoutes from "./routes/productRoutes.js";
 import connectDB from "./config/db.js"; 
 import authRoutes from "./routes/authRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
-dotenv.config();
+
+// dotenv.config();
 
 connectDB();
 
 const app = express();
 
 app.use(cors());
-app.use("/api/products", productRoutes);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/api/products", productRoutes);
+
 app.use("/api/auth", authRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/orders", orderRoutes);
+
 
 
 app.get("/", (req, res) => {
